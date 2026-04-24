@@ -2,14 +2,18 @@
 
 单文件静态页（`ornn_app.html` 等）+ 资源位图。根路径 `index.html` 会跳转到主应用。
 
-## 在 GitHub 上托管
+## 仓库
 
-已推送本仓库时，在 **Settings → Pages** 里选择：
+- **GitHub:** [github.com/Xiaoyang-Hu-96/ornn-gpu-prototype](https://github.com/Xiaoyang-Hu-96/ornn-gpu-prototype)
+
+## 在 GitHub Pages 上托管
+
+在 **Settings → Pages** 里选择：
 
 - **Source:** Deploy from a branch  
 - **Branch:** `main` / `(root)`  
 
-站点地址形如：`https://<你的用户名>.github.io/<仓库名>/`  
+站点地址形如：`https://xiaoyang-hu-96.github.io/ornn-gpu-prototype/`（以你在 Pages 中看到的实际 URL 为准）  
 首页会经 `index.html` 进入 `ornn_app.html`。
 
 ## 在 Vercel 上部署
@@ -19,7 +23,8 @@
 3. **Framework Preset:** Other；**Build / Output** 留空或默认  
 4. **Deploy**  
 
-每次 `git push` 会自动重新部署。根路径会打开 `index.html` 并进入主页面。
+- **已绑定的生产地址:** [ornn-gpu-prototype.vercel.app](https://ornn-gpu-prototype.vercel.app)（根路径会进入 `index.html` → 主应用）  
+- 与 Git 仓库已连接，每次 `git push` 会自动重新部署。
 
 ## 本地包含的文件
 
