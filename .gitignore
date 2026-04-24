@@ -1,0 +1,10 @@
+# Local / editor
+.DS_Store
+.vercel
+*.log
+
+# Tooling & symlinks (not needed to host the static site)
+.agents
+.claude
+.kiro
+skills

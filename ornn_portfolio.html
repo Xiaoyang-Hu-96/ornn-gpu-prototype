@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ornn Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-void: #0a0a0b;
+  --bg-panel: #121214;
+  --bg-panel-2: #18181b;
+  --bg-elevated: #1e1e22;
+  --bg-subtle: #1a1a1d;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-quaternary: #52525b;
+  
+  --accent-green: #10b981;
+  --accent-green-muted: rgba(16, 185, 129, 0.12);
+  --accent-green-soft: #6ee7b7;
+  --accent-red: #ef4444;
+  --accent-red-muted: rgba(239, 68, 68, 0.12);
+  --accent-amber: #f59e0b;
+  --accent-amber-muted: rgba(245, 158, 11, 0.12);
+  --accent-blue: #60a5fa;
+  --accent-blue-muted: rgba(96, 165, 250, 0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Geist', -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.font-display { font-family: 'Fraunces', serif; letter-spacing: -0.02em; }
+.font-mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum'; }
+
+/* ===== LAYOUT ===== */
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR (same as Reserve) ===== */
+.sidebar {
+  background: var(--bg-void);
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 28px;
+}
+
+.logo-mark {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #fafafa 0%, #71717a 100%);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.logo-mark::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--bg-void);
+  border-radius: 2px;
+}
+.logo-mark::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  background: linear-gradient(135deg, #fafafa 0%, #71717a 100%);
+  border-radius: 1px;
+}
+
+.logo-text {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.nav-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-quaternary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0 12px;
+  margin: 4px 0 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--bg-panel); color: var(--text-primary); }
+.nav-item.active { background: var(--bg-elevated); color: var(--text-primary); }
+.nav-icon { width: 14px; height: 14px; opacity: 0.7; }
+
+/* OCPI Module */
+.sidebar-ocpi {
+  margin: 24px 4px 0;
+  padding: 14px;
+  background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-ocpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), transparent);
+}
+
+.ocpi-module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ocpi-module-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ocpi-module-daily {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.ocpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.ocpi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.ocpi-unit {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.ocpi-change {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent-green);
+  margin-bottom: 10px;
+}
+
+.ocpi-sparkline {
+  height: 24px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.ocpi-bloomberg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-quaternary);
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  letter-spacing: 0.05em;
+}
+.ocpi-bloomberg span { color: var(--text-tertiary); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.sidebar-footer:hover { background: var(--bg-panel); }
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: white;
+}
+
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+.user-email { font-size: 10px; color: var(--text-tertiary); }
+
+/* ===== MAIN ===== */
+.main {
+  padding: 28px 40px 60px;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.page-subtitle-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.page-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.action-btn:hover {
+  background: var(--bg-panel-2);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.action-btn.primary {
+  background: var(--text-primary);
+  color: var(--bg-void);
+  border-color: var(--text-primary);
+}
+
+.action-btn.primary:hover {
+  background: #e4e4e7;
+}
+
+/* ===== TOP METRICS BAR ===== */
+.metrics-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.metric {
+  background: var(--bg-panel);
+  padding: 20px 22px;
+  position: relative;
+}
+
+.metric-featured {
+  background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
+  position: relative;
+}
+
+.metric-featured::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), transparent);
+}
+
+.metric-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.metric-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.metric-value.featured {
+  color: var(--accent-green-soft);
+  font-size: 28px;
+}
+
+.metric-unit {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.metric-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.metric-sub .highlight {
+  color: var(--accent-green-soft);
+}
+
+.metric-sub .amber {
+  color: var(--accent-amber);
+}
+
+.metric-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 3px;
+  font-size: 9px;
+  color: var(--accent-green-soft);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* ===== TABS ===== */
+.portfolio-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.tab-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 1px 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-tertiary);
+}
+
+.tab-btn.active .tab-count {
+  background: var(--bg-void);
+  color: var(--text-secondary);
+}
+
+/* ===== CONTRACT LIST ===== */
+.contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Section label between groups */
+.list-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.list-section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.list-section-header.urgent {
+  color: var(--accent-amber);
+}
+
+/* Contract card */
+.contract-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 38px 1.8fr 1.6fr 1.6fr 1fr auto;
+  gap: 20px;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}.contract-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-panel-2);
+}
+
+.contract-card.urgent {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
+}
+
+.contract-card.urgent:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+/* Asset icon */
+.contract-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Contract info columns */
+.contract-asset {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.contract-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.contract-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.contract-meta .strong {
+  color: var(--text-secondary);
+}
+
+/* Lock price vs current */
+.contract-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pricing-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-quaternary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pricing-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.pricing-main {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.pricing-vs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.pricing-vs strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.pricing-delta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+.pricing-delta.positive { color: var(--accent-green-soft); }
+.pricing-delta.negative { color: var(--accent-red); }
+
+/* Coverage value */
+.contract-coverage {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.coverage-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.coverage-value.positive { color: var(--accent-green-soft); }
+.coverage-value.negative { color: var(--text-secondary); }
+
+.coverage-hint {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.4;
+}
+
+/* Expiry */
+.contract-expiry {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.expiry-countdown {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.expiry-countdown.urgent {
+  color: var(--accent-amber);
+}
+
+.expiry-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+/* Actions */
+.contract-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.contract-action {
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.contract-action:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background: var(--bg-panel-2);
+}
+
+.contract-action.primary {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.3);
+  color: var(--accent-blue);
+}
+
+.contract-action.primary:hover {
+  background: rgba(96, 165, 250, 0.15);
+}
+
+.contract-menu {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.contract-menu:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* ===== OPEN ORDER CARD (variant) ===== */
+.contract-card.open-order {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.04) 0%, transparent 40%);
+  border-color: rgba(96, 165, 250, 0.2);
+}
+
+.contract-card.open-order .contract-icon {
+  background: rgba(96, 165, 250, 0.08);
+  border-color: rgba(96, 165, 250, 0.25);
+  color: var(--accent-blue);
+}
+
+.open-order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--accent-blue);
+  padding: 2px 7px;
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+  width: fit-content;
+}
+
+.open-order-status .pulse-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Trigger distance bar */
+.trigger-distance {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trigger-bar {
+  height: 4px;
+  background: var(--bg-void);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.trigger-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue) 0%, rgba(96, 165, 250, 0.5) 100%);
+  border-radius: 2px;
+  position: relative;
+  transition: width 0.3s;
+}
+
+/* Empty state for history */
+.tab-content-hint {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== TOGGLE VIEW ===== */
+.view-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.view-toggle button {
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 11px;
+  font-family: inherit;
+}
+
+.view-toggle button.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.tabs-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* Market explainer */
+.market-explainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.market-explainer svg {
+  color: var(--text-quaternary);
+  flex-shrink: 0;
+}
+
+.market-explainer strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Tab content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Annotations */
+
+.icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">Ornn</span>
+    </div>
+    
+    <div class="nav-section-label">Trade</div>
+    <div class="nav-item">
+      <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Reserve
+    </div>
+    <div class="nav-item">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+      Marketplace
+    </div>
+    <div class="nav-item active">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 7h18v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+      Portfolio
+    </div>
+    
+    <div class="sidebar-ocpi">
+      <div class="ocpi-module-header">
+        <span class="ocpi-module-label">OCPI · H100 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 2px; vertical-align: middle;"><polyline points="6 9 12 15 18 9"/></svg></span>
+        <span class="ocpi-module-daily">◔ Daily</span>
+      </div>
+      <div class="ocpi-value-row">
+        <span class="ocpi-value">$2.85</span>
+        <span class="ocpi-unit">/GPU·hr</span>
+      </div>
+      <div class="ocpi-change">↓ −2.8% <span style="color: var(--text-tertiary); font-weight: 400;">7d</span></div>
+      <svg class="ocpi-sparkline" viewBox="0 0 200 24" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="sparkG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,10 L10,12 L20,8 L30,14 L40,10 L50,6 L60,11 L70,16 L80,13 L90,18 L100,14 L110,20 L120,16 L130,22 L140,17 L150,13 L160,16 L170,12 L180,15 L190,19 L200,17" 
+              stroke="#10b981" stroke-width="1.2" fill="none"/>
+        <path d="M0,10 L10,12 L20,8 L30,14 L40,10 L50,6 L60,11 L70,16 L80,13 L90,18 L100,14 L110,20 L120,16 L130,22 L140,17 L150,13 L160,16 L170,12 L180,15 L190,19 L200,17 L200,24 L0,24 Z"
+              fill="url(#sparkG)"/>
+      </svg>
+      <div class="ocpi-bloomberg">
+        <span>Updated</span> Apr 23 · <span>on</span> BLOOMBERG
+      </div>
+    </div>
+    
+    <div class="sidebar-footer">
+      <div class="avatar">EH</div>
+      <div class="user-info">
+        <div class="user-name">Elena Hu</div>
+        <div class="user-email">mshuuxy@gmail.com</div>
+      </div>
+    </div>
+  </aside>
+  
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+    
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-title-group">
+        <h1 class="page-title">Portfolio</h1>
+        <span class="page-subtitle-tag">Compute Contracts</span>
+      </div>
+      <div class="page-actions">
+        <button class="action-btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Export
+        </button>
+      </div>
+    </div>
+    
+    <!-- Metrics Bar -->
+    <div class="metrics-bar" style="position: relative;">
+      <div class="metric">
+        <div class="metric-label">Active Contracts</div>
+        <div class="metric-value">7</div>
+        <div class="metric-sub">Across 3 GPU types</div>
+      </div>
+      
+      <div class="metric">
+        <div class="metric-label">Total Notional</div>
+        <div class="metric-value">$42,180<span class="metric-unit">.50</span></div>
+        <div class="metric-sub">10,240 GPU·hrs locked</div>
+      </div>
+      
+      <div class="metric metric-featured" style="position: relative;">
+        <div class="metric-label">Coverage Value</div>
+        <div class="metric-value featured">+$8,430<span class="metric-unit">.24</span></div>
+        <div class="metric-sub">Cumulative savings vs no-hedge · <span class="highlight">4 of 7 saving vs market</span></div>
+      </div>
+      
+      <div class="metric">
+        <div class="metric-label">Next Expiry</div>
+        <div class="metric-value" style="color: var(--accent-amber);">2 days</div>
+        <div class="metric-sub">H100 SXM5 · <span class="amber">Apr 25</span></div>
+      </div>
+    </div>
+    
+    <!-- Tabs + View Toggle -->
+    <div class="tabs-bar">
+      <div class="portfolio-tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'active')">
+          Active
+          <span class="tab-count">7</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab(this, 'orders')">
+          Open Orders
+          <span class="tab-count">2</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab(this, 'history')">
+          History
+          <span class="tab-count">14</span>
+        </button>
+      </div>
+      
+      <div class="view-toggle">
+        <button class="active">List</button>
+        <button>Timeline</button>
+      </div>
+    </div>
+    
+    <!-- Explainer -->
+    <div class="market-explainer">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span><strong>Market</strong> = respective OCPI sub-index for each GPU (OCPI-H100, OCPI-H200, etc.) · Updated daily at close</span>
+    </div>
+    
+    <!-- ===== ACTIVE CONTRACTS TAB ===== -->
+    <div class="tab-content active" id="active-tab">
+      
+      <!-- Urgent group -->
+      <div class="list-section-header urgent">
+        <span>⚑ Expiring Soon · 2 contracts</span>
+      </div>
+      
+      <div class="contract-list">
+        <!-- Urgent contract 1 -->
+        <div class="contract-card urgent" style="position: relative;">
+          <div class="contract-icon">H</div>
+          
+          <div class="contract-asset">
+            <span class="contract-name">H100 SXM5</span>
+            <span class="contract-meta"><span class="strong">512 GPU·hrs</span> · 2W · NY5</span>
+          </div>
+          
+          <div class="contract-pricing">
+            <span class="pricing-label">Your lock vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$2.41</span>
+              <span class="pricing-vs">vs <strong>$2.85</strong> <span class="pricing-delta positive">+18%</span></span>
+            </div>
+          </div>
+          
+          <div class="contract-coverage" style="position: relative;">
+            <span class="pricing-label">Coverage Value</span>
+            <div class="coverage-value positive">
+              +$225.28
+            </div>
+            <span class="coverage-hint">Saved</span>
+          </div>
+          
+          <div class="contract-expiry">
+            <span class="expiry-countdown urgent">Apr 25</span>
+            <span class="expiry-date">2 days · 14:00 UTC</span>
+          </div>
+          
+          <div class="contract-actions">
+            <button class="contract-action">Details</button>
+            <button class="contract-action">List</button>
+          </div>
+        </div>
+        
+        <!-- Urgent contract 2 -->
+        <div class="contract-card urgent">
+          <div class="contract-icon">H</div>
+          
+          <div class="contract-asset">
+            <span class="contract-name">H200 SXM</span>
+            <span class="contract-meta"><span class="strong">1,024 GPU·hrs</span> · 2W · Any</span>
+          </div>
+          
+          <div class="contract-pricing">
+            <span class="pricing-label">Your lock vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$3.05</span>
+              <span class="pricing-vs">vs <strong>$3.18</strong> <span class="pricing-delta positive">+4%</span></span>
+            </div>
+          </div>
+          
+          <div class="contract-coverage">
+            <span class="pricing-label">Coverage Value</span>
+            <div class="coverage-value positive">
+              +$133.12
+            </div>
+            <span class="coverage-hint">Saved</span>
+          </div>
+          
+          <div class="contract-expiry">
+            <span class="expiry-countdown urgent">Apr 26</span>
+            <span class="expiry-date">3 days · 09:00 UTC</span>
+          </div>
+          
+          <div class="contract-actions">
+            <button class="contract-action">Details</button>
+            <button class="contract-action">List</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Regular group -->
+      <div class="list-section-header">
+        <span>Active Contracts · 5</span>
+      </div>
+      
+      <div class="contract-list">
+        <!-- Regular contract (positive coverage) -->
+        <div class="contract-card">
+          <div class="contract-icon">H</div>
+          <div class="contract-asset">
+            <span class="contract-name">H100 SXM5</span>
+            <span class="contract-meta"><span class="strong">2,048 GPU·hrs</span> · 1M · SV8</span>
+          </div>
+          <div class="contract-pricing">
+            <span class="pricing-label">Your lock vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$2.58</span>
+              <span class="pricing-vs">vs <strong>$2.85</strong> <span class="pricing-delta positive">+10%</span></span>
+            </div>
+          </div>
+          <div class="contract-coverage">
+            <span class="pricing-label">Coverage Value</span>
+            <div class="coverage-value positive">
+              +$552.96
+            </div>
+            <span class="coverage-hint">Saved</span>
+          </div>
+          <div class="contract-expiry">
+            <span class="expiry-countdown">May 12</span>
+            <span class="expiry-date">19 days · 14:00 UTC</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-action">Details</button>
+            <button class="contract-action">List</button>
+          </div>
+        </div>
+        
+        <!-- Negative coverage — insurance framing -->
+        <div class="contract-card" style="position: relative;">
+          <div class="contract-icon">R</div>
+          <div class="contract-asset">
+            <span class="contract-name">RTX 5090</span>
+            <span class="contract-meta"><span class="strong">3,200 GPU·hrs</span> · 3M · DAL</span>
+          </div>
+          <div class="contract-pricing">
+            <span class="pricing-label">Your lock vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$0.72</span>
+              <span class="pricing-vs">vs <strong>$0.58</strong> <span class="pricing-delta negative">−19%</span></span>
+            </div>
+          </div>
+          <div class="contract-coverage">
+            <span class="pricing-label">Coverage Value</span>
+            <div class="coverage-value negative">
+              −$448.00
+            </div>
+            <span class="coverage-hint">Insurance cost</span>
+          </div>
+          <div class="contract-expiry">
+            <span class="expiry-countdown">Jun 23</span>
+            <span class="expiry-date">61 days · 09:00 UTC</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-action">Details</button>
+            <button class="contract-action">List</button>
+          </div>
+        </div>
+        
+        <!-- Break-even contract -->
+        <div class="contract-card">
+          <div class="contract-icon">H</div>
+          <div class="contract-asset">
+            <span class="contract-name">H200 SXM</span>
+            <span class="contract-meta"><span class="strong">1,024 GPU·hrs</span> · 1M · LD4</span>
+          </div>
+          <div class="contract-pricing">
+            <span class="pricing-label">Your lock vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$3.15</span>
+              <span class="pricing-vs">vs <strong>$3.18</strong> <span class="pricing-delta positive">+1%</span></span>
+            </div>
+          </div>
+          <div class="contract-coverage">
+            <span class="pricing-label">Coverage Value</span>
+            <div class="coverage-value positive">
+              +$30.72
+            </div>
+            <span class="coverage-hint">Near break-even</span>
+          </div>
+          <div class="contract-expiry">
+            <span class="expiry-countdown">May 20</span>
+            <span class="expiry-date">27 days · 16:00 UTC</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-action">Details</button>
+            <button class="contract-action">List</button>
+          </div>
+        </div>
+        
+        <!-- Long term contract -->
+        <div class="contract-card">
+          <div class="contract-icon">H</div>
+          <div class="contract-asset">
+            <span class="contract-name">H100 SXM5</span>
+            <span class="contract-meta"><span class="strong">2,432 GPU·hrs</span> · 6M · Any</span>
+          </div>
+          <div class="contract-pricing">
+            <span class="pricing-label">Your lock vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$2.94</span>
+              <span class="pricing-vs">vs <strong>$2.85</strong> <span class="pricing-delta negative">−3%</span></span>
+            </div>
+          </div>
+          <div class="contract-coverage">
+            <span class="pricing-label">Coverage Value</span>
+            <div class="coverage-value negative">
+              −$218.88
+            </div>
+            <span class="coverage-hint">Insurance cost</span>
+          </div>
+          <div class="contract-expiry">
+            <span class="expiry-countdown">Sep 14</span>
+            <span class="expiry-date">144 days · 14:00 UTC</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-action">Details</button>
+            <button class="contract-action">List</button>
+          </div>
+        </div>
+        
+        <!-- Another positive -->
+        <div class="contract-card">
+          <div class="contract-icon">B</div>
+          <div class="contract-asset">
+            <span class="contract-name">B200 SXM</span>
+            <span class="contract-meta"><span class="strong">256 GPU·hrs</span> · 2W · NY5</span>
+          </div>
+          <div class="contract-pricing">
+            <span class="pricing-label">Your lock vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$5.12</span>
+              <span class="pricing-vs">vs <strong>$5.82</strong> <span class="pricing-delta positive">+14%</span></span>
+            </div>
+          </div>
+          <div class="contract-coverage">
+            <span class="pricing-label">Coverage Value</span>
+            <div class="coverage-value positive">
+              +$179.20
+            </div>
+            <span class="coverage-hint">Saved</span>
+          </div>
+          <div class="contract-expiry">
+            <span class="expiry-countdown">May 6</span>
+            <span class="expiry-date">13 days · 14:00 UTC</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-action">Details</button>
+            <button class="contract-action">List</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== OPEN ORDERS TAB ===== -->
+    <div class="tab-content" id="orders-tab">
+      <div class="list-section-header">
+        <span>Waiting for Target Price · 2 orders</span>
+      </div>
+      
+      <div class="contract-list">
+        <div class="contract-card open-order">
+          <div class="contract-icon">H</div>
+          <div class="contract-asset">
+            <span class="contract-name">H100 SXM5</span>
+            <span class="contract-meta"><span class="strong">1,024 GPU·hrs</span> · 2W · Any</span>
+            <span class="open-order-status"><span class="pulse-dot"></span>Waiting</span>
+          </div>
+          <div class="contract-pricing">
+            <span class="pricing-label">Target vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$2.25</span>
+              <span class="pricing-vs">vs <strong>$2.41</strong></span>
+            </div>
+            <div class="trigger-distance" style="margin-top: 4px;">
+              <div class="trigger-bar">
+                <div class="trigger-bar-fill" style="width: 65%;"></div>
+              </div>
+              <span style="font-family: 'JetBrains Mono'; font-size: 9px; color: var(--text-tertiary);">−6.6% away from trigger</span>
+            </div>
+          </div>
+          <div class="contract-coverage">
+            <span class="pricing-label">Max Total</span>
+            <div class="coverage-value" style="color: var(--text-primary); font-size: 14px;">
+              $2,304.00
+            </div>
+            <span class="coverage-hint">If triggered · not charged yet</span>
+          </div>
+          <div class="contract-expiry">
+            <span class="expiry-countdown" style="color: var(--text-secondary); font-size: 12px;">GTC</span>
+            <span class="expiry-date">Good till cancelled</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-action">Edit</button>
+            <button class="contract-action">Cancel</button>
+          </div>
+        </div>
+        
+        <div class="contract-card open-order">
+          <div class="contract-icon">R</div>
+          <div class="contract-asset">
+            <span class="contract-name">RTX 5090</span>
+            <span class="contract-meta"><span class="strong">5,000 GPU·hrs</span> · 1M · Any</span>
+            <span class="open-order-status"><span class="pulse-dot"></span>Waiting</span>
+          </div>
+          <div class="contract-pricing">
+            <span class="pricing-label">Target vs Market</span>
+            <div class="pricing-row">
+              <span class="pricing-main">$0.52</span>
+              <span class="pricing-vs">vs <strong>$0.58</strong></span>
+            </div>
+            <div class="trigger-distance" style="margin-top: 4px;">
+              <div class="trigger-bar">
+                <div class="trigger-bar-fill" style="width: 82%;"></div>
+              </div>
+              <span style="font-family: 'JetBrains Mono'; font-size: 9px; color: var(--text-tertiary);">−10.3% away from trigger</span>
+            </div>
+          </div>
+          <div class="contract-coverage">
+            <span class="pricing-label">Max Total</span>
+            <div class="coverage-value" style="color: var(--text-primary); font-size: 14px;">
+              $2,665.00
+            </div>
+            <span class="coverage-hint">If triggered · not charged yet</span>
+          </div>
+          <div class="contract-expiry">
+            <span class="expiry-countdown" style="color: var(--text-secondary); font-size: 12px;">30d</span>
+            <span class="expiry-date">Expires May 23</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-action">Edit</button>
+            <button class="contract-action">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== HISTORY TAB ===== -->
+    <div class="tab-content" id="history-tab">
+      <div class="tab-content-hint">
+        History view: 14 settled contracts with lifetime P&L, monthly savings trend, and exportable records.
+        <br><br>
+        (Placeholder — detailed design available in slides)
+      </div>
+    </div>
+    
+  </main>
+</div>
+
+<script>
+function switchTab(el, tabName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(tabName + '-tab').classList.add('active');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ornn Reserve · Option A (Capacity-First)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-void: #0a0a0b;
+  --bg-panel: #121214;
+  --bg-panel-2: #18181b;
+  --bg-elevated: #1e1e22;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-quaternary: #52525b;
+  --accent: #fafafa;
+  
+  /* Price heatmap colors - muted, professional */
+  --price-low: #0d4a3e;      /* deep teal - cheap */
+  --price-low-bright: #10b981;
+  --price-mid: #1a2332;       /* neutral blue-grey */
+  --price-mid-bright: #64748b;
+  --price-high: #4a1d1d;      /* deep maroon - expensive */
+  --price-high-bright: #ef4444;
+  
+  --selected: #fafafa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Geist', -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.font-display {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: 'tnum';
+}
+
+/* Layout */
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--bg-void);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 32px;
+}
+
+.logo-mark {
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #fafafa 0%, #71717a 100%);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-mark::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--bg-void);
+  border-radius: 2px;
+}
+
+.logo-mark::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: linear-gradient(135deg, #fafafa 0%, #71717a 100%);
+  border-radius: 1px;
+}
+
+.logo-text {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+
+.nav-item:hover {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.nav-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.nav-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-quaternary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0 12px;
+  margin: 4px 0 8px;
+}
+
+/* OCPI sidebar module */
+.sidebar-ocpi {
+  margin: 24px 4px 0;
+  padding: 14px;
+  background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-ocpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), transparent);
+}
+
+.ocpi-module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ocpi-module-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ocpi-module-daily {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.ocpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.ocpi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.ocpi-unit {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.ocpi-change {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #10b981;
+  margin-bottom: 10px;
+}
+
+.ocpi-sparkline {
+  height: 24px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.ocpi-bloomberg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-quaternary);
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  letter-spacing: 0.05em;
+}
+.ocpi-bloomberg span { color: var(--text-tertiary); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar-footer:hover {
+  background: var(--bg-panel);
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: white;
+}
+
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+.user-email { font-size: 11px; color: var(--text-tertiary); }
+
+/* Main content */
+.main {
+  padding: 28px 36px;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.page-subtitle {
+  color: var(--text-tertiary);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Index Bar - 新增的价格上下文条 */
+.index-bar {
+  background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.index-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(250,250,250,0.1), transparent);
+}
+
+.index-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.index-label-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.index-label-name {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.index-price {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.index-price-main {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.index-price-unit {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.index-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.index-change.down {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.sparkline-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 240px;
+}
+
+.sparkline-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.sparkline {
+  height: 40px;
+  width: 100%;
+}
+
+.price-percentile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.percentile-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.percentile-bar {
+  position: relative;
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.percentile-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #10b981 0%, #64748b 50%, #ef4444 100%);
+  border-radius: 3px;
+  opacity: 0.4;
+  width: 100%;
+}
+
+.percentile-marker {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 12px;
+  background: var(--text-primary);
+  left: 32%;
+  border-radius: 1px;
+}
+
+.percentile-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.percentile-text strong {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.index-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.index-recommendation {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: right;
+  max-width: 180px;
+  line-height: 1.45;
+}
+
+.index-recommendation strong {
+  color: #10b981;
+  font-weight: 500;
+}
+
+/* GPU Selector - improved */
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* Quantity control - NEW */
+.quantity-section {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.qty-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.qty-group-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 30px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  transition: background 0.12s;
+}
+
+.qty-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.qty-display {
+  min-width: 48px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.qty-unit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.qty-presets {
+  display: flex;
+  gap: 5px;
+}
+
+.qty-preset {
+  padding: 6px 11px;
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.qty-preset:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.qty-preset.active {
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.qty-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+}
+
+.gpu-grid-wrap {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.gpu-grid-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  background: linear-gradient(90deg, transparent, var(--bg-void) 80%);
+  pointer-events: none;
+  border-radius: 0 10px 10px 0;
+  z-index: 2;
+}
+
+.gpu-grid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-right: 40px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.gpu-grid::-webkit-scrollbar {
+  height: 5px;
+}
+.gpu-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+.gpu-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.gpu-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+.gpu-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  flex: 0 0 260px;
+  min-width: 260px;
+}
+
+.gpu-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-panel-2);
+}
+
+.gpu-card.selected {
+  border-color: var(--text-primary);
+  background: var(--bg-panel-2);
+}
+
+.gpu-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.gpu-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.gpu-card-subtitle {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.gpu-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-void);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.gpu-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.gpu-stat-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.gpu-stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.gpu-stat-value .change {
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+.change.up { color: #ef4444; }
+.change.down { color: #10b981; }
+
+/* Main calendar area */
+.calendar-container {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.calendar-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.facility-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-void);
+  padding: 3px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+}
+
+.facility-tab {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.facility-tab:hover {
+  color: var(--text-secondary);
+}
+
+.facility-tab.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.facility-tab-name {
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.facility-tab-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.facility-tab.active .facility-tab-price {
+  color: var(--text-secondary);
+}
+
+.view-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nav-btn:hover {
+  background: var(--bg-panel-2);
+  color: var(--text-primary);
+}
+
+.month-display {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  color: var(--text-primary);
+  min-width: 100px;
+  text-align: center;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-void);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.view-toggle button {
+  padding: 4px 10px;
+  font-size: 11px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.view-toggle button.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* Calendar grid with price heatmap */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 52px repeat(7, 1fr);
+  gap: 2px;
+}
+
+.day-header {
+  padding: 6px 4px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.day-header-date {
+  color: var(--text-secondary);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.time-label {
+  padding: 6px 8px 6px 0;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 38px;
+}
+
+.time-slot {
+  height: 38px;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.12s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+}
+
+.time-slot .price {
+  font-size: 10px;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+.time-slot .delta {
+  font-size: 9px;
+  opacity: 0.7;
+  margin-top: 1px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Price heatmap intensities */
+.time-slot.price-low {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(13, 74, 62, 0.35));
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+}
+
+.time-slot.price-midlow {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(100, 116, 139, 0.15));
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  color: #a5b4c9;
+}
+
+.time-slot.price-mid {
+  background: rgba(100, 116, 139, 0.1);
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  color: var(--text-secondary);
+}
+
+.time-slot.price-midhigh {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(100, 116, 139, 0.15));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.time-slot.price-high {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(74, 29, 29, 0.35));
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+
+.time-slot.booked {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(39, 39, 42, 0.4),
+    rgba(39, 39, 42, 0.4) 2px,
+    rgba(24, 24, 27, 0.4) 2px,
+    rgba(24, 24, 27, 0.4) 4px
+  );
+  border: 1px solid rgba(39, 39, 42, 0.5);
+  color: var(--text-quaternary);
+  cursor: not-allowed;
+}
+
+.time-slot.booked .price::before {
+  content: '—';
+  color: var(--text-quaternary);
+}
+
+.time-slot.booked .price,
+.time-slot.booked .delta { display: none; }
+
+.time-slot.booked::after {
+  content: '—';
+  color: var(--text-quaternary);
+}
+
+.time-slot:hover:not(.booked) {
+  transform: scale(1.04);
+  z-index: 2;
+  border-color: var(--text-primary);
+}
+
+.time-slot.selected {
+  background: var(--text-primary) !important;
+  color: var(--bg-void) !important;
+  border-color: var(--text-primary) !important;
+  box-shadow: 0 2px 12px rgba(250, 250, 250, 0.2);
+}
+
+.time-slot.selected .price,
+.time-slot.selected .delta {
+  color: var(--bg-void);
+}
+
+/* Legend */
+.calendar-legend {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.legend-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.legend-scale {
+  display: flex;
+  gap: 3px;
+}
+
+.legend-scale-item {
+  width: 20px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* Summary Panel */
+.summary-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: sticky;
+  top: 20px;
+}
+
+.summary-header-row {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.summary-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
+.summary-title {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+
+.summary-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.summary-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+}
+
+.selection-status {
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.selection-icon {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #10b981;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Price comparison - NEW */
+.price-comparison {
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, rgba(30, 30, 34, 0.5) 100%);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 18px;
+}
+
+.comparison-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comparison-savings {
+  padding: 2px 6px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-radius: 3px;
+  font-size: 10px;
+}
+
+.comparison-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 11px;
+  position: relative;
+}
+
+.comparison-row.highlight {
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 4px 0;
+}
+
+.comparison-label {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.comparison-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.comparison-value {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-primary);
+}
+
+.comparison-row.highlight .comparison-value {
+  font-size: 13px;
+  color: #6ee7b7;
+  font-weight: 500;
+}
+
+/* Summary details */
+.summary-details {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-bottom: 18px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.detail-label {
+  color: var(--text-secondary);
+}
+
+.detail-value {
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.summary-total {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.total-row.main {
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.total-row.main .detail-value {
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.confirm-btn {
+  width: 100%;
+  background: var(--text-primary);
+  color: var(--bg-void);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 18px;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.confirm-btn:hover {
+  background: #e4e4e7;
+  transform: translateY(-1px);
+}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">Ornn</span>
+    </div>
+    
+    <div class="nav-section-label">Trade</div>
+    <div class="nav-item active">
+      <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Reserve
+    </div>
+    <div class="nav-item">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+      Marketplace
+    </div>
+    <div class="nav-item">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 7h18v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+      Portfolio
+    </div>
+    
+    <!-- OCPI sidebar module -->
+    <div class="sidebar-ocpi">
+      <div class="ocpi-module-header">
+        <span class="ocpi-module-label">OCPI · H100 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 2px; vertical-align: middle;"><polyline points="6 9 12 15 18 9"/></svg></span>
+        <span class="ocpi-module-daily">◔ Daily</span>
+      </div>
+      <div class="ocpi-value-row">
+        <span class="ocpi-value">$2.85</span>
+        <span class="ocpi-unit">/GPU·hr</span>
+      </div>
+      <div class="ocpi-change">↓ −2.8% <span style="color: var(--text-tertiary); font-weight: 400;">7d</span></div>
+      <svg class="ocpi-sparkline" viewBox="0 0 200 24" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="sparkG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,10 L10,12 L20,8 L30,14 L40,10 L50,6 L60,11 L70,16 L80,13 L90,18 L100,14 L110,20 L120,16 L130,22 L140,17 L150,13 L160,16 L170,12 L180,15 L190,19 L200,17" 
+              stroke="#10b981" stroke-width="1.2" fill="none"/>
+        <path d="M0,10 L10,12 L20,8 L30,14 L40,10 L50,6 L60,11 L70,16 L80,13 L90,18 L100,14 L110,20 L120,16 L130,22 L140,17 L150,13 L160,16 L170,12 L180,15 L190,19 L200,17 L200,24 L0,24 Z"
+              fill="url(#sparkG)"/>
+      </svg>
+      <div class="ocpi-bloomberg">
+        <span>Updated</span> Apr 23 · <span>on</span> BLOOMBERG
+      </div>
+    </div>
+    
+    <div class="sidebar-footer">
+      <div class="avatar">EH</div>
+      <div class="user-info">
+        <div class="user-name">Elena Hu</div>
+        <div class="user-email">mshuuxy@gmail.com</div>
+      </div>
+    </div>
+  </aside>
+  
+  <!-- Main Content -->
+  <main class="main">
+    <div class="page-header">
+      <div style="display: flex; align-items: baseline; gap: 14px;">
+        <h1 class="page-title">Reserve</h1>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #fbbf24; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 4px;">Option A · Capacity-First</span>
+      </div>
+    </div>
+    
+    <!-- GPU Selector -->
+    <div style="position: relative;">
+      <div class="section-label" style="display: flex; align-items: center; justify-content: space-between;">
+        <span>Select GPU Type</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-quaternary); letter-spacing: 0.05em; text-transform: none;">Scroll for more →</span>
+      </div>
+      <div class="gpu-grid-wrap" style="position: relative;">
+        <div class="gpu-grid">
+          <div class="gpu-card selected">
+            <div class="gpu-card-header">
+              <div>
+                <div class="gpu-card-title">H100 SXM5</div>
+                <div class="gpu-card-subtitle">80GB HBM3 · 3.35 TB/s</div>
+              </div>
+            </div>
+            <div class="gpu-card-stats">
+              <div>
+                <div class="gpu-stat-label">Index Price</div>
+                <div class="gpu-stat-value">$2.41<span class="change down">−2.8%</span></div>
+              </div>
+              <div>
+                <div class="gpu-stat-label">Liquidity</div>
+                <div class="gpu-stat-value">High</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="gpu-card">
+            <div class="gpu-card-header">
+              <div>
+                <div class="gpu-card-title">H200 SXM</div>
+                <div class="gpu-card-subtitle">141GB HBM3e · 4.8 TB/s</div>
+              </div>
+            </div>
+            <div class="gpu-card-stats">
+              <div>
+                <div class="gpu-stat-label">Index Price</div>
+                <div class="gpu-stat-value">$3.18<span class="change up">+4.1%</span></div>
+              </div>
+              <div>
+                <div class="gpu-stat-label">Liquidity</div>
+                <div class="gpu-stat-value">Medium</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="gpu-card">
+            <div class="gpu-card-header">
+              <div>
+                <div class="gpu-card-title">B200 SXM</div>
+                <div class="gpu-card-subtitle">192GB HBM3e · 8 TB/s</div>
+              </div>
+            </div>
+            <div class="gpu-card-stats">
+              <div>
+                <div class="gpu-stat-label">Index Price</div>
+                <div class="gpu-stat-value">$5.82<span class="change up">+8.6%</span></div>
+              </div>
+              <div>
+                <div class="gpu-stat-label">Liquidity</div>
+                <div class="gpu-stat-value">Low</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="gpu-card">
+            <div class="gpu-card-header">
+              <div>
+                <div class="gpu-card-title">RTX 5090</div>
+                <div class="gpu-card-subtitle">32GB GDDR7 · 1.79 TB/s</div>
+              </div>
+            </div>
+            <div class="gpu-card-stats">
+              <div>
+                <div class="gpu-stat-label">Index Price</div>
+                <div class="gpu-stat-value">$0.58<span class="change down">−5.2%</span></div>
+              </div>
+              <div>
+                <div class="gpu-stat-label">Liquidity</div>
+                <div class="gpu-stat-value">Medium</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="gpu-card">
+            <div class="gpu-card-header">
+              <div>
+                <div class="gpu-card-title">A100 SXM4</div>
+                <div class="gpu-card-subtitle">80GB HBM2e · 2 TB/s</div>
+              </div>
+            </div>
+            <div class="gpu-card-stats">
+              <div>
+                <div class="gpu-stat-label">Index Price</div>
+                <div class="gpu-stat-value">$1.45<span class="change down">−1.1%</span></div>
+              </div>
+              <div>
+                <div class="gpu-stat-label">Liquidity</div>
+                <div class="gpu-stat-value">High</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="gpu-card">
+            <div class="gpu-card-header">
+              <div>
+                <div class="gpu-card-title">GB300 NVL72</div>
+                <div class="gpu-card-subtitle">279GB · NVL72 rack</div>
+              </div>
+            </div>
+            <div class="gpu-card-stats">
+              <div>
+                <div class="gpu-stat-label">Index Price</div>
+                <div class="gpu-stat-value">$8.20<span class="change up">+12%</span></div>
+              </div>
+              <div>
+                <div class="gpu-stat-label">Liquidity</div>
+                <div class="gpu-stat-value">Low</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- NEW: Quantity Control (Wayne's feedback) -->
+    <div class="quantity-section" style="position: relative;">
+      <div class="qty-group">
+        <span class="qty-group-label">Quantity</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="qty-stepper">
+            <button class="qty-btn">−</button>
+            <div class="qty-display">8</div>
+            <button class="qty-btn">+</button>
+          </div>
+          <span class="qty-unit">GPUs</span>
+        </div>
+      </div>
+      
+      <div class="qty-divider"></div>
+      
+      <div class="qty-group">
+        <span class="qty-group-label">Common sizes</span>
+        <div class="qty-presets">
+          <button class="qty-preset">1</button>
+          <button class="qty-preset">2</button>
+          <button class="qty-preset">4</button>
+          <button class="qty-preset active">8</button>
+          <button class="qty-preset">16</button>
+          <button class="qty-preset">32</button>
+          <button class="qty-preset">64</button>
+        </div>
+      </div>
+      
+      <div style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-tertiary);">
+        Calendar availability reflects selected quantity
+      </div>
+    </div>
+    
+    <!-- Calendar + Summary -->
+    <div class="calendar-container">
+      <div class="calendar-panel" style="position: relative;">
+        <div class="calendar-header">
+          <div class="facility-tabs">
+            <button class="facility-tab active" style="position: relative;">
+              <span class="facility-tab-name">Equinix NY5</span>
+              <span class="facility-tab-price">$2.49 avg</span>
+            </button>
+            <button class="facility-tab">
+              <span class="facility-tab-name">Equinix SV8</span>
+              <span class="facility-tab-price">$2.35 avg</span>
+            </button>
+            <button class="facility-tab">
+              <span class="facility-tab-name">Equinix LD4</span>
+              <span class="facility-tab-price">$2.68 avg</span>
+            </button>
+            <button class="facility-tab">
+              <span class="facility-tab-name">DataBank DAL</span>
+              <span class="facility-tab-price">$2.28 avg</span>
+            </button>
+          </div>
+          
+          <div class="view-controls">
+            <div class="month-nav">
+              <button class="nav-btn">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="month-display">April 2026</span>
+              <button class="nav-btn">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <div class="view-toggle">
+              <button class="active">Week</button>
+              <button>Month</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="calendar-grid" style="position: relative;">
+          <div></div>
+          <div class="day-header">Mon<div class="day-header-date">3/18</div></div>
+          <div class="day-header">Tue<div class="day-header-date">3/19</div></div>
+          <div class="day-header">Wed<div class="day-header-date">3/20</div></div>
+          <div class="day-header">Thu<div class="day-header-date">3/21</div></div>
+          <div class="day-header">Fri<div class="day-header-date">3/22</div></div>
+          <div class="day-header">Sat<div class="day-header-date">3/23</div></div>
+          <div class="day-header">Sun<div class="day-header-date">3/24</div></div>
+          
+          <!-- 06:00 row -->
+          <div class="time-label">06:00</div>
+          <div class="time-slot price-low"><span class="price">$2.19</span><span class="delta">−12%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.22</span><span class="delta">−11%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.18</span><span class="delta">−12%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.31</span><span class="delta">−7%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.35</span><span class="delta">−5%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.12</span><span class="delta">−15%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.08</span><span class="delta">−16%</span></div>
+          
+          <!-- 08:00 row -->
+          <div class="time-label">08:00</div>
+          <div class="time-slot price-midlow"><span class="price">$2.38</span><span class="delta">−4%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.42</span><span class="delta">−2%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.45</span><span class="delta">−1%</span></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.55</span><span class="delta">+3%</span></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.58</span><span class="delta">+4%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.32</span><span class="delta">−6%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.28</span><span class="delta">−7%</span></div>
+          
+          <!-- 10:00 row -->
+          <div class="time-label">10:00</div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot price-mid"><span class="price">$2.42</span><span class="delta">−2%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.40</span><span class="delta">−3%</span></div>
+          
+          <!-- 12:00 row -->
+          <div class="time-label">12:00</div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.52</span><span class="delta">+2%</span></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.50</span><span class="delta">+1%</span></div>
+          
+          <!-- 14:00 row -->
+          <div class="time-label">14:00</div>
+          <div class="time-slot selected"><span class="price">$2.49</span><span class="delta">+0%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.72</span><span class="delta">+10%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.78</span><span class="delta">+12%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.82</span><span class="delta">+14%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.85</span><span class="delta">+15%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.48</span><span class="delta">+0%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.45</span><span class="delta">−1%</span></div>
+          
+          <!-- 16:00 row -->
+          <div class="time-label">16:00</div>
+          <div class="time-slot selected"><span class="price">$2.49</span><span class="delta">+0%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.76</span><span class="delta">+11%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.82</span><span class="delta">+14%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.88</span><span class="delta">+16%</span></div>
+          <div class="time-slot price-high"><span class="price">$2.90</span><span class="delta">+17%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.46</span><span class="delta">−1%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.42</span><span class="delta">−2%</span></div>
+          
+          <!-- 18:00 row -->
+          <div class="time-label">18:00</div>
+          <div class="time-slot selected"><span class="price">$2.49</span><span class="delta">+0%</span></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.62</span><span class="delta">+6%</span></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.65</span><span class="delta">+7%</span></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.68</span><span class="delta">+8%</span></div>
+          <div class="time-slot price-midhigh"><span class="price">$2.70</span><span class="delta">+9%</span></div>
+          <div class="time-slot price-mid"><span class="price">$2.42</span><span class="delta">−2%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.38</span><span class="delta">−4%</span></div>
+          
+          <!-- 20:00 row -->
+          <div class="time-label">20:00</div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot booked"></div>
+          <div class="time-slot price-midlow"><span class="price">$2.32</span><span class="delta">−6%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.28</span><span class="delta">−7%</span></div>
+          
+          <!-- 22:00 row -->
+          <div class="time-label">22:00</div>
+          <div class="time-slot price-low"><span class="price">$2.18</span><span class="delta">−12%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.22</span><span class="delta">−11%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.20</span><span class="delta">−11%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.28</span><span class="delta">−8%</span></div>
+          <div class="time-slot price-midlow"><span class="price">$2.32</span><span class="delta">−6%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.12</span><span class="delta">−15%</span></div>
+          <div class="time-slot price-low"><span class="price">$2.08</span><span class="delta">−16%</span></div>
+        </div>
+        
+        <div class="calendar-legend">
+          <div class="legend-group">
+            <span class="legend-label">Price vs Index</span>
+            <div class="legend-scale">
+              <div class="legend-scale-item" style="background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.25);"></div>
+              <div class="legend-scale-item" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(100, 116, 139, 0.2);"></div>
+              <div class="legend-scale-item" style="background: rgba(100, 116, 139, 0.15); border: 1px solid rgba(100, 116, 139, 0.2);"></div>
+              <div class="legend-scale-item" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);"></div>
+              <div class="legend-scale-item" style="background: rgba(239, 68, 68, 0.3); border: 1px solid rgba(239, 68, 68, 0.25);"></div>
+            </div>
+            <span style="font-size: 10px; color: var(--text-tertiary); font-family: 'JetBrains Mono'">−15% to +15%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: var(--text-primary);"></div>
+            Selected
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: repeating-linear-gradient(45deg, #27272a, #27272a 2px, #18181b 2px, #18181b 4px);"></div>
+            Booked
+          </div>
+        </div>
+      </div>
+      
+      <!-- Summary Panel -->
+      <div class="summary-panel" style="position: relative;">
+        <div class="summary-header-row">
+          <div class="summary-label">Reservation Summary</div>
+        </div>
+        
+        <div class="summary-title">Equinix NY5</div>
+        <div class="summary-meta">
+          <span class="summary-meta-chip">CoreWeave CHI-1</span>
+          <span class="summary-meta-chip">US East</span>
+        </div>
+        
+        <div class="selection-status">
+          <div class="selection-icon"></div>
+          3 slots selected · Mon 14:00–20:00
+        </div>
+        
+        <!-- NEW: Price Comparison -->
+        <div class="price-comparison" style="position: relative;">
+          <div class="comparison-header">
+            Price Benchmark
+            <span class="comparison-savings">Save 3.2%</span>
+          </div>
+          <div class="comparison-row">
+            <span class="comparison-label">
+              <span class="comparison-dot" style="background: #ef4444;"></span>
+              Peak price (7d)
+            </span>
+            <span class="comparison-value">$2.85</span>
+          </div>
+          <div class="comparison-row">
+            <span class="comparison-label">
+              <span class="comparison-dot" style="background: #64748b;"></span>
+              30-day average
+            </span>
+            <span class="comparison-value">$2.57</span>
+          </div>
+          <div class="comparison-row highlight">
+            <span class="comparison-label" style="color: #6ee7b7;">
+              <span class="comparison-dot" style="background: #10b981;"></span>
+              Your locked rate
+            </span>
+            <span class="comparison-value">$2.49</span>
+          </div>
+          <div class="comparison-row">
+            <span class="comparison-label">
+              <span class="comparison-dot" style="background: #10b981;"></span>
+              7-day low
+            </span>
+            <span class="comparison-value">$2.08</span>
+          </div>
+        </div>
+        
+        <div class="summary-details">
+          <div class="detail-row"><span class="detail-label">GPU Type</span><span class="detail-value">H100 80GB SXM5</span></div>
+          <div class="detail-row"><span class="detail-label">Facility</span><span class="detail-value">Equinix NY5</span></div>
+          <div class="detail-row"><span class="detail-label">Nodes</span><span class="detail-value">8</span></div>
+          <div class="detail-row"><span class="detail-label">Time slots</span><span class="detail-value">3 × 2hr</span></div>
+          <div class="detail-row"><span class="detail-label">Total GPU·hrs</span><span class="detail-value">512</span></div>
+          <div class="detail-row"><span class="detail-label">Rate</span><span class="detail-value">$2.49/GPU·hr</span></div>
+        </div>
+        
+        <!-- NEW: Cluster Spec section -->
+        <div class="summary-details" style="margin-top: 4px; padding-top: 14px; border-top: 1px dashed var(--border); position: relative;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px;">Cluster Spec</div>
+          <div class="detail-row"><span class="detail-label">Architecture</span><span class="detail-value">HGX H100 8-GPU Node</span></div>
+          <div class="detail-row"><span class="detail-label">Interconnect</span><span class="detail-value">NVLink + IB 400G</span></div>
+          <div class="detail-row"><span class="detail-label">Storage</span><span class="detail-value">Shared NVMe · 2 TB/s</span></div>
+        </div>
+        
+        <div class="summary-total">
+          <div class="total-row"><span class="detail-label">Compute (512 GPU·hrs)</span><span class="detail-value">$1,274.88</span></div>
+          <div class="total-row"><span class="detail-label">Booking fee (2.5%)</span><span class="detail-value">$31.87</span></div>
+          <div class="total-row main"><span>Total</span><span class="detail-value">$1,306.75</span></div>
+        </div>
+        
+        <button class="confirm-btn">Reserve Capacity →</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// Make time slots interactive for demo
+document.querySelectorAll('.time-slot:not(.booked):not(.selected)').forEach(slot => {
+  slot.addEventListener('click', function() {
+    this.classList.toggle('selected');
+  });
+});
+</script>
+
+</body>
+</html>
